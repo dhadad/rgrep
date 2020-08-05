@@ -5,18 +5,15 @@ pub use config::Config;
 
 pub fn search<'a>(query: &str, content: &'a mut str, sensitive: bool) -> Vec<&'a str> {
     //query is orginated in an instance of the Config type, and as such immutable
-    let mut query = query.to_string(); //an mutable copy of it
+    let mut query = query.to_string(); //an mutable copy of it, so we can lowercase it without affecting the original
     if !sensitive {
         query = query.to_lowercase();
         content.make_ascii_lowercase();
     }
-    let mut v: Vec<&str> = Vec::new();
-    for line in content.lines() {
-        if line.contains(&query) {
-            v.push(line);
-        }
-    }
-    v
+    //lines() returns an iterator we'll call 'line'.
+    content.lines()
+        .filter(|line| line.contains(&query))
+        .collect()
 }
 
 pub fn run(con: &Config) -> Result<(), Box<dyn Error>> {

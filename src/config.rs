@@ -10,14 +10,20 @@ impl Config {
     pub fn get_file(&self) -> &str {
         &(self.file.as_str())
     }
-    pub fn new(args: &Vec<String>) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("Not enought arguments");
-        }
+    //The function is given an std::env::Args iterator (with ownership over it)
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+        args.next();
+        let file = match args.next() {
+            Some(s) => s,
+            None => return Err("Problematic file address, try again."),
+        };
+        let query = match args.next() {
+            Some(s) => s,
+            None => return Err("Problematic search query, try again."),
+        };
         Ok(Config {
-            //In order to independent of "args" lifetime
-            query: args[2].clone(),
-            file: args[1].clone(),
+            query,
+            file,
         })
     }
 }
